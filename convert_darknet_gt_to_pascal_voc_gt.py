@@ -55,7 +55,7 @@ def main(
             names (PathLike): path to obj.names
     """
 
-    Path(f'{Path(file_path).parents[1]}/pascal_voc_gt').mkdir(parents=True, exist_ok=True)
+    Path(f'{Path(file_path).parent}/pascal_voc_gt').mkdir(parents=True, exist_ok=True)
     with open(names, "r") as f:
         obj_names = f.read().splitlines()
         # print(obj_names)

@@ -61,7 +61,7 @@ def main(
             file_path (PathLike): path result.json
     """
     Path(
-        f'{Path(file_path).parents[1]}/pascal_voc_detect').mkdir(parents=True, exist_ok=True)
+        f'{Path(file_path).parent}/pascal_voc_detect').mkdir(parents=True, exist_ok=True)
 
     with open(file_path, 'r') as f:
         data = json.load(f)
