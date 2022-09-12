@@ -22,7 +22,7 @@ def convert_darknet_to_pascal_voc(bbox, w, h):
 def parse_darknet_txt(image_path: PathLike, obj_names):
     txt_file = Path(image_path).with_suffix('.txt')
     new_txt = Path(image_path).parents[1] / 'pascal_voc_gt' / (
-        f'{Path(image_path).parents[0].name}.' + Path(txt_file).name)
+        f'{Path(image_path).parents[0].name}_' + Path(txt_file).name)
     # print(txt_file)
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     height, width = image.shape[0], image.shape[1]

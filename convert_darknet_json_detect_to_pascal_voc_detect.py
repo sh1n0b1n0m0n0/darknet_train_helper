@@ -24,7 +24,7 @@ def parse_darknet_json(batch):
 
     txt_file = Path(image_path).with_suffix('.txt')
     new_txt = Path(image_path).parents[1] / 'pascal_voc_detect' / (
-        f'{Path(image_path).parents[0].name}.' + Path(txt_file).name)
+        f'{Path(image_path).parents[0].name}_' + Path(txt_file).name)
 
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     height, width = image.shape[0], image.shape[1]
