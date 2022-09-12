@@ -6,6 +6,28 @@ import fire
 import shutil
 
 
+def make_obj_data_file(new_project_folder):
+    '''
+        train = /<new_project_folder>/train.txt
+        names = /<new_project_folder>/obj.names
+        backup = /<new_project_folder>/backup
+        classes = 1
+    '''
+    obj_data_path = Path(new_project_folder) / "obj.data"
+    with open(obj_data_path, "w") as f:
+        data = f"train = {new_project_folder}/train.txt\nnames = {new_project_folder}/obj.names\nbackup = {new_project_folder}/backup\nclasses = 1"
+        f.write(data)
+
+
+def make_obj_names_file(new_project_folder, class_name):
+    '''
+        class name
+    '''
+    obj_names_path = Path(new_project_folder) / "obj.names"
+    with open(obj_names_path, "w") as f:
+        f.write(class_name)
+
+
 def class_remover(train_txt_path, obj_names, label):
     counter = 0
     empty_counter = 0
@@ -17,7 +39,10 @@ def class_remover(train_txt_path, obj_names, label):
 
     new_project_folder = Path(train_txt_path).parents[1]/f"rv_yolo_1cl_{labels[int(label)]}"
     new_project_folder.mkdir(parents=True, exist_ok=True)
-
+    Path(new_project_folder / "backup").mkdir(parents=True, exist_ok=True)
+    
+    make_obj_names_file(new_project_folder, labels[int(label)])
+    make_obj_data_file(new_project_folder)
     with open(train_txt_path, "r") as f:
         imgs = f.read().splitlines()
 
@@ -47,9 +72,11 @@ def class_remover(train_txt_path, obj_names, label):
                 # print(txt_guts[splited_txt.index(i)], new_txt_path)
 
                 Path(new_txt_path.parent).mkdir(parents=True, exist_ok=True)
-                
+                line = txt_guts[splited_txt.index(i)]
+                line = line.replace(str(label), str("0"), 1)
+
                 with open(new_txt_path, "a") as ff:
-                    ff.write(txt_guts[splited_txt.index(i)])
+                    ff.write(line)
                     ff.write('\n')
 
                 new_images_list.append(new_image_path)
@@ -73,7 +100,7 @@ def make_train_set_txt(images, empty_images, new_project_folder):
             f.write(str(img))
             f.write("\n")
 
-    print(f"len images: {len(images)}, len empty images: {len(empty_images)}, batch of empty: {len(empty_images[:int(len(images)/2)])}")
+    print(f"Number of not empty images: {len(images)}, number of empty images: {len(empty_images)}, batch of empty images for training: {len(empty_images[:int(len(images)/2)])}")
 
 
 def main(
