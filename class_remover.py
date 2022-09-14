@@ -51,47 +51,44 @@ def class_remover(train_txt_path, obj_names, label):
     for img, txt in tqdm(zip(imgs, txts), total=len(imgs)):
         new_txt_path = new_project_folder / Path(txt).parent.name / Path(txt).name
         new_image_path = new_project_folder / Path(img).parent.name / Path(img).name
+        Path(new_txt_path.parent).mkdir(parents=True, exist_ok=True)
         # print(new_txt_path)
         with open(txt, "r") as f:
             txt_guts = f.read().splitlines()
             splited_txt = [item.split() for item in txt_guts]
-
+        
         if len(splited_txt) == 0:
             empty_counter += 1
-            Path(new_txt_path.parent).mkdir(parents=True, exist_ok=True)
 
             shutil.copyfile(img, new_image_path)
             empty_list.append(new_image_path)
 
             with open(Path(new_image_path).with_suffix('.txt'), "w") as f:
                 f.write("")
+        else:
+            for i in splited_txt:
+                if int(i[0]) == int(label):
+                    counter += 1
+                    # print(txt_guts[splited_txt.index(i)], new_txt_path)
 
-        for i in splited_txt:
-            if int(i[0]) == label:
-                counter += 1
-                # print(txt_guts[splited_txt.index(i)], new_txt_path)
+                    line = txt_guts[splited_txt.index(i)]
+                    line = line.replace(str(label), str("0"), 1)
 
-                Path(new_txt_path.parent).mkdir(parents=True, exist_ok=True)
-                line = txt_guts[splited_txt.index(i)]
-                line = line.replace(str(label), str("0"), 1)
+                    new_images_list.append(new_image_path)
+                    shutil.copyfile(img, new_image_path)
 
-                with open(new_txt_path, "a") as ff:
-                    ff.write(line)
-                    ff.write('\n')
+                    with open(new_txt_path, "a") as ff:
+                        ff.write(line)
+                        ff.write('\n')
 
-                new_images_list.append(new_image_path)
-                shutil.copyfile(img, new_image_path)
-
-            elif len(i[0]) == 0:
-                empty_counter += 1
-    
-    print(f"class {labels[int(label)]} - {label}: {counter}")
+                    
+    print(f"class {labels[int(label)]} - {int(label)}: {counter}")
     print(f"empty images: {empty_counter}")
     make_train_set_txt(new_images_list, empty_list, new_project_folder)
 
 
 def make_train_set_txt(images, empty_images, new_project_folder):
-    full_set = images + empty_images[:int(len(images)/2)]
+    full_set = list(set(images + empty_images[:int(len(images)/2)]))
     random.shuffle(full_set)
     train_txt_dir = Path(new_project_folder) / "train.txt"
 
