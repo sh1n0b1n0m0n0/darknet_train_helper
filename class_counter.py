@@ -3,11 +3,10 @@ from tqdm import tqdm
 import random
 from os import PathLike
 import fire
-import shutil
 import pandas as pd
 
 
-def class_remover(train_txt_path, obj_names):
+def class_counter(train_txt_path, obj_names):
     empty_counter = 0
     temp_dict = {}
     classes_list = []
@@ -63,7 +62,7 @@ def main(
     """
 
     if Path(txt_path).is_file() and Path(obj_names).is_file():
-        class_remover(txt_path, obj_names)
+        class_counter(txt_path, obj_names)
     else:
         print(f"{txt_path} doesn't exist.")
 
