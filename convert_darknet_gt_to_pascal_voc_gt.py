@@ -19,9 +19,9 @@ def convert_darknet_to_pascal_voc(bbox, w, h):
     return [xmin, ymin, xmax, ymax]
 
 
-def parse_darknet_txt(image_path: PathLike, obj_names):
+def parse_darknet_txt(image_path: PathLike, obj_names, save_path):
     txt_file = Path(image_path).with_suffix('.txt')
-    new_txt = Path(image_path).parents[1] / 'pascal_voc_gt' / (
+    new_txt = Path(save_path) / (
         f'{Path(image_path).parents[0].name}_' + Path(txt_file).name)
     # print(txt_file)
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
@@ -47,15 +47,17 @@ def parse_darknet_txt(image_path: PathLike, obj_names):
 
 def main(
     file_path: PathLike,
-    names: PathLike
+    names: PathLike,
+    save_path: PathLike
 ):
     """
         Args:
             file_path (PathLike): path to valid.txt
             names (PathLike): path to obj.names
+            save_path (PathLike): path to save
     """
-
-    Path(f'{Path(file_path).parent}/pascal_voc_gt').mkdir(parents=True, exist_ok=True)
+    
+    Path(save_path).mkdir(parents=True, exist_ok=True)
     with open(names, "r") as f:
         obj_names = f.read().splitlines()
         # print(obj_names)
@@ -63,7 +65,7 @@ def main(
     with open(file_path, "r") as f:
         lines = f.read().splitlines()
         for line in tqdm(lines):
-            parse_darknet_txt(line, obj_names)
+            parse_darknet_txt(line, obj_names, save_path)
 
 
 if __name__ == "__main__":

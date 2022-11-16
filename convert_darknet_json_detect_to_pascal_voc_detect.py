@@ -18,12 +18,12 @@ def convert_darknet_to_pascal_voc(bbox, w, h):
     return [xmin, ymin, xmax, ymax]
 
 
-def parse_darknet_json(batch):
+def parse_darknet_json(batch, save_path):
     image_path = batch["filename"]  # don't forget to iterate over data
     events = batch["objects"]
 
     txt_file = Path(image_path).with_suffix('.txt')
-    new_txt = Path(image_path).parents[1] / 'pascal_voc_detect' / (
+    new_txt = Path(save_path) / (
         f'{Path(image_path).parents[0].name}_' + Path(txt_file).name)
 
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
@@ -55,18 +55,19 @@ def parse_darknet_json(batch):
 
 def main(
     file_path: PathLike,
+    save_path: PathLike
 ):
     """
         Args:
             file_path (PathLike): path result.json
+            save_path (PathLike): path to save
     """
-    Path(
-        f'{Path(file_path).parent}/pascal_voc_detect').mkdir(parents=True, exist_ok=True)
+    Path(save_path).mkdir(parents=True, exist_ok=True)
 
     with open(file_path, 'r') as f:
         data = json.load(f)
         for batch in tqdm(data):
-            parse_darknet_json(batch)
+            parse_darknet_json(batch, save_path)
 
 
 if __name__ == "__main__":
