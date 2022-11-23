@@ -2,7 +2,6 @@ from pathlib import Path
 from tqdm import tqdm
 import cv2
 from os import PathLike
-import fire
 import yaml
 
 
@@ -59,4 +58,4 @@ def main():
 
 
 if __name__ == "__main__":
-    fire.Fire(main)
+    main()
