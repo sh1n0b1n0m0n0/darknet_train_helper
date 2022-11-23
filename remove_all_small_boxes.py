@@ -1,19 +1,27 @@
 from pathlib import Path
 from tqdm import tqdm
 import cv2
-from inexlib.utils.file_system import list_folder_files_with_extension
 from os import PathLike
 import fire
+import yaml
 
 
-def remove_small_boxes(project_path: PathLike, number_of_classes: int, resize: int):
-    list_of_images = list_folder_files_with_extension(
-        project_path, ["*.jp*g", "*.png"])
-    image = cv2.imread(list_of_images[0].as_posix(), cv2.IMREAD_UNCHANGED)
+def remove_small_boxes(dataset_path: PathLike, number_of_classes: int, resize: int):
+    list_of_images = []
+    types = ["*.jp*g", "*.png"]
+    for t in types:
+        try:
+            for img in Path(dataset_path).glob(t):
+                list_of_images.append(str(img))
+        except ValueError:
+            print("Dataset is Empty!")
+
+    list_of_images.sort()
+    image = cv2.imread(list_of_images[0], cv2.IMREAD_UNCHANGED)
     height, width, _ = image.shape
     # print(image.shape)
     list_of_classes = [str(n) for n in range(number_of_classes)]
-    for txt_file in tqdm(Path(project_path).glob('*.txt')):
+    for txt_file in tqdm(Path(dataset_path).glob('*.txt')):
         with open(txt_file, "r") as f:
             lines = f.readlines()
 
@@ -34,18 +42,20 @@ def remove_small_boxes(project_path: PathLike, number_of_classes: int, resize: i
     print("Complete.\n")
 
 
-def main(
-    folder_path: PathLike
-):
-    """
-        Args:
-            folder_path (PathLike): path to train data.
-    """
-    # root = "/home/alexsh/temp/rv_yolo_18cl/291/"
-
+def main():
     classes = 18
     resize = 416
-    remove_small_boxes(folder_path, classes, resize)
+    params = yaml.safe_load(open(Path.cwd() / Path("params.yaml")))["prepare"]
+    paths = yaml.safe_load(open(Path.cwd() / Path("paths.yaml")))["train"]
+    datasets = params["datasets"]
+    data_root = paths["datasets_root"]
+    
+    if params["remove_small_boxes"]:
+        print("Small boxes removed!\n")
+        for dataset in datasets:
+            remove_small_boxes(Path(data_root) / str(dataset), classes, resize)
+    else:
+        print("Small boxes are not removed!\n")
 
 
 if __name__ == "__main__":
