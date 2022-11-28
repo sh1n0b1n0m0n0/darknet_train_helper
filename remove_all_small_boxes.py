@@ -52,6 +52,7 @@ def main():
     if params["remove_small_boxes"]:
         print("Small boxes removed!\n")
         for dataset in datasets:
+            print(dataset)
             remove_small_boxes(Path(data_root) / str(dataset), classes, resize)
     else:
         print("Small boxes are not removed!\n")
