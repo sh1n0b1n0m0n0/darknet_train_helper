@@ -5,13 +5,13 @@ import glob
 from os import PathLike
 import fire
 import json
+import yaml
 
 
-def parse_ul_yolo_json(file_path, batch, obj_names):
+def parse_ul_yolo_json(batch, obj_names, save_path):
     image_path = batch["filename"]  # don't forget to iterate over data
 
-    new_txt = Path(file_path).parent / 'pascal_voc_ul_detect' / (
-        f'{Path(image_path)}.txt')
+    new_txt = Path(save_path) / (f'{Path(image_path)}.txt')
 
     with open(new_txt, "a") as f:
         label = batch["class_id"]
@@ -26,24 +26,20 @@ def parse_ul_yolo_json(file_path, batch, obj_names):
         f.write('\n')
 
 
-def main(
-    file_path: PathLike,
-    names: PathLike
-):
-    """
-        Args:
-            file_path (PathLike): path result.json
-            names (PathLike): path to obj.names
-    """
-    Path(f'{Path(file_path).parent}/pascal_voc_ul_detect').mkdir(parents=True, exist_ok=True)
-    with open(names, "r") as f:
-        obj_names = f.read().splitlines()
-        # print(obj_names)
+def main():
+    config_path = Path('/home/alexsh/yolov3/data/configs/yolov3-tiny_20cls.yaml')
+    labels_path = Path('/home/alexsh/yolov3/data/val/labels')
+    result_path = Path('/home/alexsh/yolov3/runs/val/exp2/best_predictions.json')
 
-    with open(file_path, "r") as f:
+    save_path = Path(f'{labels_path.parent}/pascal_voc_ul_det')
+    save_path.mkdir(parents=True, exist_ok=True)
+
+    obj_names = yaml.safe_load(open(Path.cwd() / Path(config_path)))["names"]
+
+    with open(result_path, "r") as f:
         data = json.load(f)
         for batch in tqdm(data):
-            parse_ul_yolo_json(file_path, batch, obj_names)
+            parse_ul_yolo_json(batch, obj_names, save_path)
 
 
 if __name__ == "__main__":

@@ -30,6 +30,7 @@ def make_obj_names_file(new_project_folder, old_labels, new_labels):
     '''
     obj_names_path = Path(new_project_folder) / "obj.names"
     print(old_labels)
+    print(new_labels)
     with open(obj_names_path, "a") as f:
         for index in new_labels:
             f.write(old_labels[index])
@@ -45,7 +46,7 @@ def class_remover(train_txt_path, obj_names, new_labels):
     with open(obj_names, "r") as f:
         old_labels = f.read().splitlines()
 
-    new_project_folder = Path(train_txt_path).parents[1]/f"rv_yolo_{len(new_labels)}cl"
+    new_project_folder = Path(train_txt_path).parents[1]/f"rv_yolo_{len(new_labels)}cls"
     new_project_folder.mkdir(parents=True, exist_ok=True) # make new project folder
     Path(new_project_folder / "backup").mkdir(parents=True, exist_ok=True) # make backup folder
     
@@ -97,7 +98,7 @@ def class_remover(train_txt_path, obj_names, new_labels):
 def make_train_set_txt(images, empty_images, new_project_folder):
     full_set = list(set(images + empty_images[:int(len(images)/2)]))
     random.shuffle(full_set)
-    train_txt_dir = Path(new_project_folder) / "valid.txt"
+    train_txt_dir = Path(new_project_folder) / "train.txt"
 
     with open(str(train_txt_dir), "w") as f:
         for img in full_set:
@@ -110,17 +111,17 @@ def make_train_set_txt(images, empty_images, new_project_folder):
 def main(
     txt_path: PathLike,
     obj_names: PathLike,
-    labels: List[int] = []
+    classes: List[int] = []
 ):
     """
         Args:
             txt_path (PathLike): path to train.txt.
             obj_names (PathLike): path to obj.names
-            label (List): 
+            classes (List): 
     """
 
     if Path(txt_path).is_file() and Path(obj_names).is_file():
-        class_remover(txt_path, obj_names, labels)
+        class_remover(txt_path, obj_names, classes)
     else:
         print(f"{txt_path} doesn't exist.")
 

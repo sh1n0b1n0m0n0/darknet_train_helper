@@ -42,7 +42,7 @@ def remove_small_boxes(dataset_path: PathLike, number_of_classes: int, resize: i
 
 
 def main():
-    classes = 18
+    classes = 20
     resize = 416
     params = yaml.safe_load(open(Path.cwd() / Path("params.yaml")))["prepare"]
     paths = yaml.safe_load(open(Path.cwd() / Path("paths.yaml")))["train"]
